@@ -1,0 +1,96 @@
+{
+  "openapi": "3.0.0",
+  "info": { "title": "Booking Service API", "version": "1.0.0" },
+  "servers": [{ "url": "http://localhost:3002" }],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  },
+  "security": [{ "bearerAuth": [] }],
+  "paths": {
+    "/bookings": {
+      "post": {
+        "summary": "Create a booking",
+        "tags": ["Bookings"],
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "resource": { "type": "string", "example": "Meeting Room A" },
+                  "startTime": { "type": "string", "example": "2025-09-01T10:00:00Z" },
+                  "endTime": { "type": "string", "example": "2025-09-01T11:00:00Z" }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "201": { "description": "Booking created" } }
+      },
+      "get": {
+        "summary": "List bookings (user sees own, admin sees all)",
+        "tags": ["Bookings"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "status", "in": "query", "schema": { "type": "string", "example": "BOOKED" } },
+          { "name": "resource", "in": "query", "schema": { "type": "string", "example": "Meeting Room A" } },
+          { "name": "page", "in": "query", "schema": { "type": "integer", "example": 1 } },
+          { "name": "limit", "in": "query", "schema": { "type": "integer", "example": 10 } }
+        ],
+        "responses": { "200": { "description": "List of bookings" } }
+      }
+    },
+    "/bookings/{id}": {
+      "get": {
+        "summary": "Get booking by ID (own or any for admin)",
+        "tags": ["Bookings"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string", "example": "uuid-here" } }
+        ],
+        "responses": { "200": { "description": "Booking found" } }
+      },
+      "patch": {
+        "summary": "Update booking (own or any for admin)",
+        "tags": ["Bookings"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string", "example": "uuid-here" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "resource": { "type": "string", "example": "Updated Room" },
+                  "startTime": { "type": "string", "example": "2025-09-01T12:00:00Z" },
+                  "endTime": { "type": "string", "example": "2025-09-01T13:00:00Z" }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "200": { "description": "Booking updated" } }
+      },
+      "delete": {
+        "summary": "Cancel booking (own or any for admin)",
+        "tags": ["Bookings"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string", "example": "uuid-here" } }
+        ],
+        "responses": { "200": { "description": "Booking cancelled" } }
+      }
+    }
+  }
+}
