@@ -9,7 +9,7 @@ const logger = (moduleName: string) =>
       format.printf(({ timestamp, level, message, label, ...meta }) => {
         const metaStr = Object.keys(meta).length ? JSON.stringify(meta) : "";
         return `${timestamp} | ${label} | ${level.toUpperCase()} | ${message}${metaStr ? ` | ${metaStr}` : ""}`;
-      })
+      }),
     ),
     transports: [
       new transports.Console(),
