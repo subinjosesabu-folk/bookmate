@@ -4,6 +4,7 @@ import swaggerUi from "swagger-ui-express";
 import * as swaggerDocument from "./swagger.json";
 import { AppDataSource } from "./data-source";
 import bookingRoutes from "./routes/bookingRoutes";
+import resourceRoutes from "./routes/resourceRoutes";
 import { errorHandler } from "./middleware/errorHandler";
 import logger from "./utils/logger";
 
@@ -22,6 +23,7 @@ async function start() {
 
     // Routes
     app.use("/bookings", bookingRoutes);
+    app.use("/resources", resourceRoutes);
 
     // Error handling
     app.use(errorHandler);

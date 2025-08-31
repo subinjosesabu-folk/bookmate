@@ -5,7 +5,9 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   DeleteDateColumn,
+  ManyToOne,
 } from "typeorm";
+import { Resource } from "./Resource";
 
 export enum BookingStatus {
   BOOKED = "BOOKED",
@@ -17,8 +19,8 @@ export class Booking {
   @PrimaryGeneratedColumn("uuid")
   id!: string;
 
-  @Column({ type: "varchar", length: 100 })
-  resource!: string;
+  @ManyToOne(() => Resource, (resource) => resource.bookings, { eager: true })
+  resource!: Resource;
 
   @Column({ type: "timestamptz" })
   startTime!: Date;
