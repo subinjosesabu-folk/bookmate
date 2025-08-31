@@ -9,14 +9,16 @@ export async function seedAdmin() {
   const adminRole = await roleRepo.findOne({ where: { name: "admin" } });
   if (!adminRole) throw new Error("Admin role missing");
 
-  const existing = await userRepo.findOne({ where: { email: "admin@example.com" } });
+  const existing = await userRepo.findOne({
+    where: { email: "admin@example.com" },
+  });
   if (!existing) {
     const hashed = await bcrypt.hash("Admin@123", 10);
     const admin = userRepo.create({
       name: "Super Admin",
       email: "admin@example.com",
       password: hashed,
-      role: adminRole
+      role: adminRole,
     });
     await userRepo.save(admin);
   }

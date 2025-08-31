@@ -4,8 +4,9 @@ import { Role } from "../entity/Role";
 export async function seedRoles() {
   const repo = AppDataSource.getRepository(Role);
   const roles = [
-    { id: 1, name: "user" },
-    { id: 2, name: "admin" }
+    { id: 1, name: "pending" },
+    { id: 2, name: "user" },
+    { id: 3, name: "admin" },
   ];
 
   for (const r of roles) {

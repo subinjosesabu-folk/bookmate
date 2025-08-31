@@ -22,7 +22,7 @@ async function start() {
   app.listen(port, () => logger.info(`Server listening on ${port}`));
 }
 
-start().catch(err => {
+start().catch((err) => {
   console.error(err);
   process.exit(1);
 });

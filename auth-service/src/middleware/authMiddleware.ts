@@ -1,24 +1,30 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
-import { AppDataSource } from "../data-source";
-import { User } from "../entity/User";
 
 export interface AuthRequest extends Request {
-  user?: Partial<User>;
+  user?: { sub: string; role: string };
 }
 
-export async function authMiddleware(req: AuthRequest, res: Response, next: NextFunction) {
-  const header = req.headers.authorization;
-  if (!header) return res.status(401).json({ message: "Missing Authorization header" });
-  const token = header.split(" ")[1];
+export function authenticate(
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction,
+) {
+  const authHeader = req.headers["authorization"];
+  if (!authHeader)
+    return res.status(401).json({ message: "No token provided" });
+
+  const token = authHeader.split(" ")[1];
+  if (!token) return res.status(401).json({ message: "Invalid token format" });
+
   try {
-    const payload: any = jwt.verify(token, process.env.JWT_SECRET || "change_me");
-    const repo = AppDataSource.getRepository(User);
-    const user = await repo.findOne({ where: { id: payload.sub } });
-    if (!user) return res.status(401).json({ message: "Invalid token (user not found)" });
-    req.user = { id: user.id, email: user.email, role: user.role };
+    const decoded = jwt.verify(
+      token,
+      process.env.JWT_SECRET || "change_me",
+    ) as any;
+    req.user = { sub: decoded.sub, role: decoded.role };
     next();
   } catch (err) {
-    return res.status(401).json({ message: "Invalid token" });
+    return res.status(401).json({ message: "Invalid or expired token" });
   }
 }

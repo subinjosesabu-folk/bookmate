@@ -7,6 +7,15 @@
   "servers": [
     { "url": "http://localhost:3001" }
   ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  },
   "paths": {
     "/auth/register": {
       "post": {
@@ -21,8 +30,7 @@
                 "properties": {
                   "name": { "type": "string", "example": "Saynora Sibu" },
                   "email": { "type": "string", "example": "saynora@example.com" },
-                  "password": { "type": "string", "example": "Password123!" },
-                  "roleName": { "type": "string", "example": "user" }
+                  "password": { "type": "string", "example": "Password123!" }
                 },
                 "required": ["name", "email", "password"]
               }
@@ -69,6 +77,103 @@
             }
           },
           "401": { "description": "Invalid credentials" }
+        }
+      }
+    },
+    "/auth/users": {
+      "get": {
+        "summary": "List all users (Admin only)",
+        "tags": ["Admin"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "List of users",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": { "type": "string" },
+                      "email": { "type": "string" },
+                      "role": { "type": "string" },
+                      "isEnabled": { "type": "boolean" }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized" }
+        }
+      }
+    },
+    "/auth/users/{id}/role": {
+      "patch": {
+        "summary": "Change user role (Admin only)",
+        "tags": ["Admin"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "roleName": { "type": "string", "example": "user" }
+                },
+                "required": ["roleName"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Role updated successfully" },
+          "400": { "description": "Invalid role" },
+          "404": { "description": "User not found" }
+        }
+      }
+    },
+    "/auth/users/{id}/status": {
+      "patch": {
+        "summary": "Enable or disable a user (Admin only)",
+        "tags": ["Admin"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "isEnabled": { "type": "boolean", "example": false }
+                },
+                "required": ["isEnabled"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "User status updated" },
+          "400": { "description": "Bad request" },
+          "404": { "description": "User not found" }
         }
       }
     }

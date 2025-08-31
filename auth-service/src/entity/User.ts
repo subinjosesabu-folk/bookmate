@@ -1,4 +1,12 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, CreateDateColumn, UpdateDateColumn, DeleteDateColumn } from "typeorm";
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  CreateDateColumn,
+  UpdateDateColumn,
+  DeleteDateColumn,
+} from "typeorm";
 import { Role } from "./Role";
 
 @Entity({ name: "users" })
@@ -17,6 +25,9 @@ export class User {
 
   @ManyToOne(() => Role, (role) => role.users, { eager: true })
   role!: Role;
+
+  @Column({ type: "boolean", default: true })
+  isEnabled!: boolean;
 
   @CreateDateColumn({ type: "timestamptz" })
   createdAt!: Date;
