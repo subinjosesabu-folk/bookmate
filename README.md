@@ -1,4 +1,4 @@
-# BookMate (Day 1 + Day 2)
+# BookMate (Day 1 + Day 2 + Day 3)
 
 ## Overview
 Full-stack booking platform with microservices (**auth-service**, **booking-service**) and a **React frontend**.
@@ -124,3 +124,145 @@ REACT_APP_BOOKING_URL=http://localhost:3002
 - SRS: [`/docs/SRS.md`](./docs/SRS.md)
 
 ---
+
+## Deployment (Day 3)
+
+### Docker Setup
+
+All services are dockerized with their own `Dockerfile` and `.dockerignore`.
+
+```bash
+docker-compose up --build
+```
+
+* **Frontend** → [http://localhost:3000](http://localhost:3000)
+* **Auth Service** → [http://localhost:3001](http://localhost:3001)
+* **Booking Service** → [http://localhost:3002](http://localhost:3002)
+* **Postgres DB** → localhost:5432
+
+### Environment Variables
+
+Each service has its own `.env` file. Example:
+
+**auth-service/.env**
+
+```env
+PORT=3001
+DB_HOST=postgres
+DB_PORT=5432
+DB_USER=postgres
+DB_PASSWORD=postgres
+DB_NAME=booking_platform
+JWT_SECRET=supersecret
+```
+
+**booking-service/.env**
+
+```env
+PORT=3002
+DB_HOST=postgres
+DB_PORT=5432
+DB_USER=postgres
+DB_PASSWORD=postgres
+DB_NAME=booking_platform
+AUTH_SERVICE_URL=http://auth-service:3001
+```
+
+**frontend/.env**
+
+```env
+REACT_APP_AUTH_URL=http://localhost:3001
+REACT_APP_BOOKING_URL=http://localhost:3002
+```
+
+### CI/CD Pipeline (GitHub Actions)
+
+A simple pipeline for linting, building, and deploying.
+
+**.github/workflows/ci.yml**
+
+```yaml
+name: CI/CD
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15
+        ports: ["5432:5432"]
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: booking_platform
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install dependencies (auth-service)
+        run: cd auth-service && npm install
+
+      - name: Install dependencies (booking-service)
+        run: cd booking-service && npm install
+
+      - name: Install dependencies (frontend)
+        run: cd frontend && npm install
+
+      - name: Run build
+        run: |
+          cd auth-service && npm run build
+          cd ../booking-service && npm run build
+          cd ../frontend && npm run build
+
+      - name: Run tests
+        run: |
+          cd auth-service && npm test -- --watchAll=false
+          cd ../booking-service && npm test -- --watchAll=false
+          cd ../frontend && npm test -- --watchAll=false
+
+      - name: Docker Build
+        run: docker-compose build
+
+      - name: Docker Push (optional)
+        run: echo "Push to Docker Hub here if configured"
+```
+
+### Deployment Guide
+
+1. Ensure Docker and Docker Compose are installed.
+2. Clone the repo:
+
+   ```bash
+   git clone https://github.com/subinjosesabu-folk/bookmate
+   cd bookmate
+   ```
+3. Create `.env` files inside each service (`auth-service`, `booking-service`, `frontend`).
+4. Run:
+
+   ```bash
+   docker-compose up --build
+   ```
+5. Access the application:
+
+   * Frontend → [http://localhost:3000](http://localhost:3000)
+   * Backend Services → [http://localhost:3001](http://localhost:3001), [http://localhost:3002](http://localhost:3002)
+
+### Deployment Flow (Architecture)
+
+```
+[Frontend React App] ---> [Auth Service] ----> [Postgres DB]
+         |                    |
+         |                    V
+         +-----> [Booking Service] ----> [Postgres DB]
+```
+
+In production, these services can be hosted on **AWS ECS/EC2** or **Elastic Beanstalk**. Use **AWS Secrets Manager** or environment variables for secrets.
+

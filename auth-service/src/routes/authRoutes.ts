@@ -2,7 +2,7 @@ import { Router } from "express";
 import { AppDataSource } from "../data-source";
 import { User } from "../entity/User";
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
+import jwt, { SignOptions } from "jsonwebtoken";
 import loggerFactory from "../utils/logger";
 import { validateDto } from "../middleware/validate-dto";
 import { RegisterDto } from "../dto/register.dto";
@@ -72,11 +72,15 @@ router.post("/login", validateDto(LoginDto), async (req, res, next) => {
     const ok = await bcrypt.compare(password, user.password);
     if (!ok) return res.status(401).json({ message: "Invalid credentials" });
 
-    const token = jwt.sign(
-      { sub: user.id, role: user.role.name },
-      process.env.JWT_SECRET || "change_me",
-      { expiresIn: process.env.JWT_EXPIRES_IN || "1h" },
-    );
+    const signOptions: SignOptions = {
+  expiresIn: (process.env.JWT_EXPIRES_IN as any) || "1h"
+};
+
+const token = jwt.sign(
+  { sub: user.id, role: user.role.name },
+  (process.env.JWT_SECRET || "change_me") as string,
+  signOptions
+);
 
     logger.info("User logged in", { userId: user.id, email: user.email });
 
