@@ -54,11 +54,11 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "resourceId": { "type": "string", "example": "uuid-of-resource" },
+                  "resource": { "type": "string", "example": "uuid-of-resource" },
                   "startTime": { "type": "string", "example": "2025-09-01T10:00:00Z" },
                   "endTime": { "type": "string", "example": "2025-09-01T11:00:00Z" }
                 },
-                "required": ["resourceId", "startTime", "endTime"]
+                "required": ["resource", "startTime", "endTime"]
               }
             }
           }

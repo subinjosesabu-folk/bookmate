@@ -79,7 +79,17 @@ router.post("/login", validateDto(LoginDto), async (req, res, next) => {
     );
 
     logger.info("User logged in", { userId: user.id, email: user.email });
-    res.json({ token });
+
+    // Return both token and user info
+    res.json({
+      token,
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role.name,
+      },
+    });
   } catch (err: any) {
     logger.error("Login failed", { error: err.message });
     next(err);

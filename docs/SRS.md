@@ -1,8 +1,9 @@
 # System Requirement Specification (SRS)
-**Project:** Booking Platform  
+
+**Project:** BookMate  
 **Version:** 1.0  
 **Date:** 2025-08-31  
-**Author:** Subin Jose Sabu
+**Author:** Subin Jose Sabu  
 
 ---
 
@@ -33,6 +34,8 @@ Swagger API documentation is provided for both services.
 - JWT-based authentication  
 - Role-based authorization  
 - Booking CRUD with ownership rules  
+- Resource management (admin only)  
+- Validations: no overlap, max 4 hrs, future only  
 - API documentation with Swagger  
 
 ### 2.3 Constraints
@@ -46,24 +49,24 @@ Swagger API documentation is provided for both services.
 ## 3. Functional Requirements
 
 ### 3.1 Auth Service
-- Register new user with name, email, password, role  
+- Register new user with name, email, password  
 - Login user with email and password  
 - Generate JWT token with role and user ID  
+- Admin can manage user roles and enable/disable users  
 
 ### 3.2 Booking Service
 - Create booking (authenticated user or admin)  
+  - Validations: required fields, no past time, end > start, max 4 hrs, no overlaps  
 - List bookings  
   - User → only own bookings  
   - Admin → all bookings  
 - Get booking by ID  
   - User → only own  
-  - Admin → any  
+  - Admin → any (with resource + createdBy details)  
 - Update booking (patch)  
   - User → only own  
   - Admin → any  
-- Cancel booking (soft delete)  
-  - User → only own  
-  - Admin → any  
+- Cancel booking (soft delete → status `cancelled`)  
 
 ---
 

@@ -6,6 +6,7 @@ import { AppDataSource } from "./data-source";
 import authRoutes from "./routes/authRoutes";
 import { errorHandler } from "./middleware/errorHandler";
 import loggerFactory from "./utils/logger";
+import cors from "cors";
 
 dotenv.config();
 const logger = loggerFactory("auth-service");
@@ -13,7 +14,18 @@ const logger = loggerFactory("auth-service");
 async function start() {
   await AppDataSource.initialize();
   const app = express();
+
   app.use(express.json());
+
+  // enable CORS so frontend can call this service
+  app.use(
+    cors({
+      origin: "http://localhost:3000", // your React app
+      methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+      credentials: true,
+    }),
+  );
+
   app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
   app.use("/auth", authRoutes);
   app.use(errorHandler);

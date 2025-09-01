@@ -34,7 +34,7 @@ router.post("/", authorize(["admin"]), async (req: AuthRequest, res, next) => {
 router.get("/", authorize(["user", "admin"]), async (req, res, next) => {
   try {
     const repo = AppDataSource.getRepository(Resource);
-    const resources = await repo.find({ where: { isActive: true } });
+    const resources = await repo.find();
     res.json(resources);
   } catch (err: any) {
     log.error("Failed to list resources", { error: err.message });

@@ -2,11 +2,14 @@ import { Router } from "express";
 import { AppDataSource } from "../data-source";
 import { Booking, BookingStatus } from "../entity/Booking";
 import logger from "../utils/logger";
+import axios from "axios";
 import { authenticate, AuthRequest } from "../middleware/authMiddleware";
 import { authorize } from "../middleware/roleMiddleware";
 
 const log = logger("booking-service");
 const router = Router();
+
+const AUTH_SERVICE_URL = process.env.AUTH_API_URL || "http://localhost:3001";
 
 // Protect all routes
 router.use(authenticate);
@@ -25,6 +28,30 @@ router.post(
       }
 
       const bookingRepo = AppDataSource.getRepository(Booking);
+
+      // Overlap check
+      const overlap = await bookingRepo
+        .createQueryBuilder("b")
+        .where("b.resource = :resource", { resource })
+        .andWhere("b.deletedAt IS NULL")
+        .andWhere("b.status = :status", { status: BookingStatus.BOOKED })
+        .andWhere("(b.startTime < :endTime AND b.endTime > :startTime)", {
+          startTime,
+          endTime,
+        })
+        .getOne();
+
+      if (overlap) {
+        return res.status(409).json({
+          message:
+            "This resource is already booked for the selected time range",
+          conflict: {
+            startTime: overlap.startTime,
+            endTime: overlap.endTime,
+          },
+        });
+      }
+
       const booking = bookingRepo.create({
         resource,
         startTime,
@@ -33,10 +60,12 @@ router.post(
         createdBy: req.user!.sub,
       });
       const saved = await bookingRepo.save(booking);
+
       log.info("Booking created", {
         bookingId: saved.id,
         createdBy: req.user!.sub,
       });
+
       res.status(201).json(saved);
     } catch (err: any) {
       log.error("Booking creation failed", { error: err.message });
@@ -56,26 +85,53 @@ router.get(
 
       const qb = bookingRepo
         .createQueryBuilder("b")
+        .leftJoinAndSelect("b.resource", "r")
         .where("b.deletedAt IS NULL");
 
-      // If user role → filter to only their own bookings
       if (req.user!.role === "user") {
         qb.andWhere("b.createdBy = :createdBy", { createdBy: req.user!.sub });
       }
 
       if (status) qb.andWhere("b.status = :status", { status });
-      if (resource)
-        qb.andWhere("b.resource ILIKE :resource", {
-          resource: `%${resource}%`,
-        });
+      if (resource) {
+        qb.andWhere("r.name ILIKE :resource", { resource: `%${resource}%` });
+      }
 
       const [data, total] = await qb
-        .skip((page - 1) * limit)
-        .take(limit)
+        .skip((page - 1) * Number(limit))
+        .take(Number(limit))
         .orderBy("b.startTime", "ASC")
         .getManyAndCount();
 
-      res.json({ total, page: Number(page), limit: Number(limit), data });
+      let users: Record<string, any> = {};
+
+      // Only fetch user details if admin
+      if (req.user!.role === "admin") {
+        try {
+          const resp = await axios.get(`${AUTH_SERVICE_URL}/auth/users`, {
+            headers: { Authorization: req.headers.authorization || "" },
+          });
+          users = Object.fromEntries(resp.data.map((u: any) => [u.id, u]));
+        } catch (e) {
+          log.error("Could not fetch user details from auth-service", {
+            error: (e as any).message,
+          });
+        }
+      }
+
+      // Enrich bookings
+      const enriched = data.map((b) => ({
+        ...b,
+        createdBy:
+          req.user!.role === "admin" ? users[b.createdBy] || null : null,
+      }));
+
+      res.json({
+        total,
+        page: Number(page),
+        limit: Number(limit),
+        data: enriched,
+      });
     } catch (err: any) {
       log.error("Failed to list bookings", { error: err.message });
       next(err);

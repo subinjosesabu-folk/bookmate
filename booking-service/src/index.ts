@@ -7,6 +7,7 @@ import bookingRoutes from "./routes/bookingRoutes";
 import resourceRoutes from "./routes/resourceRoutes";
 import { errorHandler } from "./middleware/errorHandler";
 import logger from "./utils/logger";
+import cors from "cors";
 
 dotenv.config();
 const log = logger("booking-service");
@@ -18,14 +19,18 @@ async function start() {
 
     app.use(express.json());
 
-    // Swagger
-    app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+    app.use(
+      cors({
+        origin: "http://localhost:3000",
+        methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+        credentials: true,
+      }),
+    );
 
-    // Routes
+    app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
     app.use("/bookings", bookingRoutes);
     app.use("/resources", resourceRoutes);
 
-    // Error handling
     app.use(errorHandler);
 
     const port = process.env.PORT || 3002;
