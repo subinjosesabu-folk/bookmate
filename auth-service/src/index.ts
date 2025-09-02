@@ -20,7 +20,7 @@ async function start() {
   // enable CORS so frontend can call this service
   app.use(
     cors({
-      origin: "http://localhost:3000", // your React app
+      origin: ["http://localhost:3000", "http://3.105.188.67:3000"],
       methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
       credentials: true,
     }),

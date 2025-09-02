@@ -5,8 +5,9 @@
     "version": "1.0.0"
   },
   "servers": [
-    { "url": "http://localhost:3001" }
-  ],
+  { "url": "http://3.105.188.67:4000", "description": "Auth Service on EC2" },
+  { "url": "http://localhost:4000", "description": "Local Auth Service" }
+],
   "components": {
     "securitySchemes": {
       "bearerAuth": {

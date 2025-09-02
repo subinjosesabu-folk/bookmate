@@ -73,14 +73,14 @@ router.post("/login", validateDto(LoginDto), async (req, res, next) => {
     if (!ok) return res.status(401).json({ message: "Invalid credentials" });
 
     const signOptions: SignOptions = {
-  expiresIn: (process.env.JWT_EXPIRES_IN as any) || "1h"
-};
+      expiresIn: (process.env.JWT_EXPIRES_IN as any) || "1h",
+    };
 
-const token = jwt.sign(
-  { sub: user.id, role: user.role.name },
-  (process.env.JWT_SECRET || "change_me") as string,
-  signOptions
-);
+    const token = jwt.sign(
+      { sub: user.id, role: user.role.name },
+      (process.env.JWT_SECRET || "change_me") as string,
+      signOptions,
+    );
 
     logger.info("User logged in", { userId: user.id, email: user.email });
 
