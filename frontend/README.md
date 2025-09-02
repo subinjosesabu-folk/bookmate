@@ -10,7 +10,7 @@ cd frontend
 npm install
 npm start
 ```
-Runs on: http://localhost:3000
+Runs on: http://3.105.188.67:3000
 
 ---
 
@@ -31,8 +31,8 @@ Runs on: http://localhost:3000
 ## Environment Variables
 Create `.env` in `/frontend`:
 ```env
-REACT_APP_AUTH_URL=http://localhost:3001
-REACT_APP_BOOKING_URL=http://localhost:3002
+REACT_APP_AUTH_URL=http://3.105.188.67:4000
+REACT_APP_BOOKING_URL=http://3.105.188.67:4001
 ```
 
 ---

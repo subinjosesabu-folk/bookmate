@@ -37,14 +37,14 @@ npm run seed
 ```bash
 docker-compose up --build
 ```
-- `auth-service` → http://localhost:3001  
-- `booking-service` → http://localhost:3002  
+- `auth-service` → http://3.105.188.67:4000  
+- `booking-service` → http://3.105.188.67:4001  
 
 ---
 
 ### Swagger Documentation
-- Auth Service → http://localhost:3001/api-docs  
-- Booking Service → http://localhost:3002/api-docs  
+- Auth Service → http://3.105.188.67:4000/api-docs  
+- Booking Service → http://3.105.188.67:4001/api-docs  
 
 ---
 
@@ -56,7 +56,7 @@ docker-compose up --build
 
 ### API Reference
 
-#### Auth Service (3001)
+#### Auth Service (4000)
 | Endpoint | Method | Role | Description |
 |----------|--------|------|-------------|
 | `/auth/register` | POST | Public | Register a new user |
@@ -65,7 +65,7 @@ docker-compose up --build
 | `/auth/users/:id/role` | PATCH | Admin | Update role (user/admin) |
 | `/auth/users/:id/status` | PATCH | Admin | Enable/disable a user |
 
-#### Booking Service (3002)
+#### Booking Service (4001)
 
 **Resources**
 | Endpoint | Method | Role | Description |
@@ -94,11 +94,11 @@ cd frontend
 npm install
 npm start
 ```
-- Runs on http://localhost:3000  
+- Runs on http://3.105.188.67:3000
 - Connects to backend services via `.env`:
 ```env
-REACT_APP_AUTH_URL=http://localhost:3001
-REACT_APP_BOOKING_URL=http://localhost:3002
+REACT_APP_AUTH_URL=http://3.105.188.67:4000
+REACT_APP_BOOKING_URL=http://3.105.188.67:4001
 ```
 
 ### Features
@@ -119,8 +119,8 @@ REACT_APP_BOOKING_URL=http://localhost:3002
 
 ## Documentation
 - Swagger docs:  
-  - Auth Service → http://localhost:3001/api-docs  
-  - Booking Service → http://localhost:3002/api-docs  
+  - Auth Service → http://3.105.188.67:4000/api-docs  
+  - Booking Service → http://3.105.188.67:4001/api-docs  
 - SRS: [`/docs/SRS.md`](./docs/SRS.md)
 
 ---
@@ -135,10 +135,10 @@ All services are dockerized with their own `Dockerfile` and `.dockerignore`.
 docker-compose up --build
 ```
 
-* **Frontend** → [http://localhost:3000](http://localhost:3000)
-* **Auth Service** → [http://localhost:3001](http://localhost:3001)
-* **Booking Service** → [http://localhost:3002](http://localhost:3002)
-* **Postgres DB** → localhost:5432
+* **Frontend** → [http://3.105.188.67:3000](http://3.105.188.67:3000)
+* **Auth Service** → [http://3.105.188.67:4000](http://3.105.188.67:4000)
+* **Booking Service** → [http://3.105.188.67:4001](http://3.105.188.67:4001)
+* **Postgres DB** → bookmate-db:5432 (internal Docker network, not public)
 
 ### Environment Variables
 
@@ -165,14 +165,14 @@ DB_PORT=5432
 DB_USER=postgres
 DB_PASSWORD=postgres
 DB_NAME=booking_platform
-AUTH_SERVICE_URL=http://auth-service:3001
+AUTH_SERVICE_URL=http://3.105.188.67:4000
 ```
 
 **frontend/.env**
 
 ```env
-REACT_APP_AUTH_URL=http://localhost:3001
-REACT_APP_BOOKING_URL=http://localhost:3002
+REACT_APP_AUTH_URL=http://3.105.188.67:4000
+REACT_APP_BOOKING_URL=http://3.105.188.67:4001
 ```
 
 ### CI/CD Pipeline (GitHub Actions)
@@ -252,8 +252,8 @@ jobs:
    ```
 5. Access the application:
 
-   * Frontend → [http://localhost:3000](http://localhost:3000)
-   * Backend Services → [http://localhost:3001](http://localhost:3001), [http://localhost:3002](http://localhost:3002)
+   * Frontend → [http://3.105.188.67:3000](http://3.105.188.67:3000)
+   * Backend Services → [http://3.105.188.67:4000](http://3.105.188.67:4000), [http://3.105.188.67:4001](http://3.105.188.67:4001)
 
 ### Deployment Flow (Architecture)
 

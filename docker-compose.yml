@@ -8,8 +8,7 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: booking_platform
-    ports:
-      - "5432:5432"
+    
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -46,7 +45,7 @@ services:
     build: ./frontend
     container_name: bookmate-frontend
     ports:
-      - "3000:80"   # map host port 3000 → container port 80
+      - "3000:80"   # host 3000 → container 80
     depends_on:
       auth-service:
         condition: service_started
