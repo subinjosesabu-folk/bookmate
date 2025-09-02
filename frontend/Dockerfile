@@ -17,6 +17,9 @@ FROM nginx:alpine
 # Copy build output to Nginx html folder
 COPY --from=build /app/build /usr/share/nginx/html
 
+# Copy custom Nginx config for React SPA routing
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
 # Expose port 80 inside container
 EXPOSE 80
 
