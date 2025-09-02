@@ -3,12 +3,17 @@ FROM node:18-alpine AS build
 
 WORKDIR /app
 
-# Install dependencies
+# Copy package.json and install dependencies
 COPY package*.json ./
 RUN npm install
 
-# Copy all source code and build
+# Copy .env before build so React can use it
+COPY .env .env
+
+# Copy all source code
 COPY . .
+
+# Build React app
 RUN npm run build
 
 # --- Stage 2: Serve with Nginx ---
