@@ -9,7 +9,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -54,14 +53,14 @@ jobs:
 
       - name: Run tests (frontend)
         run: cd frontend && npm test || echo "No tests"
-deploy:
-    runs-on: ubuntu-latest
-    needs: build  
 
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
     steps:
-     - name: Deploy to EC2
-       uses: appleboy/ssh-action@v0.1.10
-       with:
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v0.1.10
+        with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
@@ -70,4 +69,3 @@ deploy:
             git pull origin main
             docker-compose down
             docker-compose up -d --build
-
