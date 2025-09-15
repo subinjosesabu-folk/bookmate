@@ -223,7 +223,7 @@ const Dashboard = () => {
                   : ""
               }`}
             >
-              Manage Users
+              Manage Users/ Roles
             </button>
             <button
               onClick={() => setActiveTab("manageResources")}
