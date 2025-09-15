@@ -54,3 +54,20 @@ jobs:
 
       - name: Run tests (frontend)
         run: cd frontend && npm test || echo "No tests"
+deploy:
+    runs-on: ubuntu-latest
+    needs: build  
+
+    steps:
+     - name: Deploy to EC2
+       uses: appleboy/ssh-action@v0.1.10
+       with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            cd /home/ubuntu/bookmate
+            git pull origin main
+            docker-compose down
+            docker-compose up -d --build
+
